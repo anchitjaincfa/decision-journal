@@ -1,0 +1,112 @@
+/* Design tokens. Colors are roles, not hues: components never use raw hex.
+   Chart colors are the validated red/blue diverging pair on a gray midpoint
+   (overconfident ↔ underconfident), checked for color-vision deficiency. */
+
+:root {
+  color-scheme: light;
+
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface-2: #f8f9fa;
+  --surface-sunk: #eef0f3;
+  --hairline: #e2e5ea;
+  --hairline-strong: #cdd2da;
+
+  --ink: #101217;
+  --ink-2: #4f5562;
+  --ink-3: #686e7a;
+  --ink-inverse: #ffffff;
+
+  /* Results (diverging): over = said more than reality, under = said less. */
+  --over: #d13f3e;
+  --over-ink: #b42f2f;
+  --over-wash: #fdeeee;
+  --under: #2a78d6;
+  --under-ink: #1f63b8;
+  --under-wash: #ebf3fd;
+  --even: #8a8f99;
+  --even-ink: #4f5562;
+  --even-wash: #eef0f3;
+
+  /* Status: good outcome (used with a label, never alone). */
+  --good: #13854a;
+  --good-wash: #e8f5ee;
+
+  --focus: #2a78d6;
+
+  --font: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --r-sm: 8px;
+  --r: 12px;
+  --r-lg: 16px;
+
+  --shadow-pop: 0 1px 2px rgb(16 18 23 / 0.04), 0 8px 24px rgb(16 18 23 / 0.08);
+
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+  --s8: 64px;
+
+  --max: 1120px;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg: #0d0f13;
+    --surface: #161920;
+    --surface-2: #1b1f27;
+    --surface-sunk: #12141a;
+    --hairline: #262b35;
+    --hairline-strong: #353b47;
+    --ink: #eceef2;
+    --ink-2: #a9afbb;
+    --ink-3: #7d8391;
+    --ink-inverse: #0d0f13;
+    --over: #e66767;
+    --over-ink: #f08a8a;
+    --over-wash: #2a1719;
+    --under: #3987e5;
+    --under-ink: #7fb2f0;
+    --under-wash: #14213a;
+    --even: #7d8391;
+    --even-ink: #b9bec8;
+    --even-wash: #1f232c;
+    --good: #3fbf7a;
+    --good-wash: #13261c;
+    --focus: #7fb2f0;
+    --shadow-pop: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.4);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0d0f13;
+  --surface: #161920;
+  --surface-2: #1b1f27;
+  --surface-sunk: #12141a;
+  --hairline: #262b35;
+  --hairline-strong: #353b47;
+  --ink: #eceef2;
+  --ink-2: #a9afbb;
+  --ink-3: #7d8391;
+  --ink-inverse: #0d0f13;
+  --over: #e66767;
+  --over-ink: #f08a8a;
+  --over-wash: #2a1719;
+  --under: #3987e5;
+  --under-ink: #7fb2f0;
+  --under-wash: #14213a;
+  --even: #7d8391;
+  --even-ink: #b9bec8;
+  --even-wash: #1f232c;
+  --good: #3fbf7a;
+  --good-wash: #13261c;
+  --focus: #7fb2f0;
+  --shadow-pop: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.4);
+}
