@@ -1,5 +1,6 @@
 import { href, type Route } from '../lib/router';
 import { BrandMark } from './BrandMark';
+import { PlusIcon } from './Icons';
 
 export function TopBar({ route }: { route: Route }) {
   const current = (page: Route['page']) => (route.page === page ? 'page' : undefined);
@@ -24,13 +25,5 @@ export function TopBar({ route }: { route: Route }) {
         </a>
       </div>
     </header>
-  );
-}
-
-export function PlusIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
-      <path d="M7 1.5v11M1.5 7h11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
   );
 }

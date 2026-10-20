@@ -9,7 +9,7 @@ Build mode: fast. The learner delegated the build end to end ("Create the entire
 
 ## Slices
 
-- [ ] **1. The sample journal opens and you can browse it**
+- [x] **1. The sample journal opens and you can browse it**
   Becomes usable: A running app with the top bar, Maya's sample journal seeded into browser storage, a Journal list with filters, and a read-only decision detail page.
   Why now: Proves the whole path (scaffold → data → storage → screen) and produces the realistic data every later slice, including the kernel, depends on.
   PRD ref: `prd.md > Screens and Layout`, `prd.md > Journal`, `prd.md > Sample data and starting fresh`
@@ -19,7 +19,7 @@ Build mode: fast. The learner delegated the build end to end ("Create the entire
   Learner check: Open the app, browse Maya's journal, filter to Money, open a decision.
   Commit: `Scaffold app with sample journal, journal list, and decision detail`
 
-- [ ] **2. The Reality check warns you while you decide (the kernel)**
+- [x] **2. The Reality check warns you while you decide (the kernel)**
   Becomes usable: New decision form with live Reality check (headline, evidence rows with sample sizes, suggestion, "Use N%"), validation, and saving to the journal.
   Why now: This is the unique kernel. It comes immediately after the data exists, before any dashboard work.
   PRD ref: `prd.md > Logging a decision`, `prd.md > Reality check while deciding`

@@ -8,6 +8,7 @@ import {
   realityCheck,
   score,
   smoothedRate,
+  summarize,
 } from './stats';
 import type { Decision } from './types';
 
@@ -153,5 +154,28 @@ describe('realityCheck after taking the suggestion', () => {
   it('keeps pointing at the chosen mood, not a generic bucket', () => {
     const rc = realityCheck(sample, { area: 'money', mood: 'excited', confidence: 50 });
     expect(rc.secondary).toMatch(/when you’re excited/);
+  });
+});
+
+describe('summarize', () => {
+  it('leads with high-confidence calls when there are enough of them', () => {
+    const h = summarize(sample).headline!;
+    expect(h.felt).toBe('80%+ sure');
+    expect(h.direction).toBe('over');
+    expect(h.n).toBeGreaterThanOrEqual(MIN_N);
+  });
+
+  it('changes when one more outcome is recorded', () => {
+    const before = summarize(sample).overall;
+    const recorded = sample.map((d) =>
+      d.id === 's33' ? { ...d, outcome: { actual: 'a', verdict: 'no' as const, result: 'bad' as const, recordedAt: NOW.toISOString() } } : d,
+    );
+    const after = summarize(recorded).overall;
+    expect(after.n).toBe(before.n + 1);
+    expect(after.hitRate).toBeLessThan(before.hitRate);
+  });
+
+  it('has no headline for an empty journal', () => {
+    expect(summarize([]).headline).toBeNull();
   });
 });
