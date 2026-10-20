@@ -49,7 +49,7 @@ Build mode: fast. The learner delegated the build end to end ("Create the entire
   Learner check: Read the Insights page as if it were your own and say whether the blind spots are clear.
   Commit: `Add insights dashboard with blind spots and charts`
 
-- [ ] **5. Starting fresh, empty states, and polish**
+- [x] **5. Starting fresh, empty states, and polish**
   Becomes usable: Sample banner with Start my own (inline confirm), Reload sample journal, empty/thin states everywhere, storage-failure banner, responsive phone layout, dark mode, accessibility pass.
   Why now: Turns a demo into a complete product experience (the Design criterion) once all behavior exists.
   PRD ref: `prd.md > Sample data and starting fresh`, `prd.md > States and Boundaries`, `prd.md > Look and Feel`

@@ -40,7 +40,7 @@ PRD ref: `prd.md > The Core Journey`.
 - **Runtime:** any modern browser. Development needs Node.js 20+ and npm.
 - **Run locally:** `npm install` then `npm run dev`, then open the printed URL (http://localhost:5173).
 - **Tests:** `npm test` (Vitest). **Production build:** `npm run build` (outputs `dist/`).
-- **Live link (chosen):** deployed on **Vercel** as a static site (`vercel --prod`). The free Hobby plan is enough. No environment variables or keys.
+- **Live link (chosen):** deployed on **Vercel** as a static site (`vercel deploy --prod`) at **https://decision-journal-liard.vercel.app**. (`decision-journal.vercel.app` belongs to an unrelated project.) The free Hobby plan is enough. No environment variables or keys.
 - **Demo recording:** use the live URL in a fresh browser profile so the sample journal loads. **Reload sample journal** in the footer resets it between takes.
 - Submission still requires the demo video and the public GitHub repo (https://github.com/anchitjaincfa/decision-journal). The live link is an extra.
 

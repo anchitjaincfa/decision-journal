@@ -1,5 +1,7 @@
 # Decision Journal
 
+**Live:** https://decision-journal-liard.vercel.app
+
 Write down what you expect and how sure you are **before** you decide. Record what actually happened **later**. Decision Journal compares the two and shows:
 
 1. **Expected vs. actual**: where your predictions were right or wrong, by life area.
