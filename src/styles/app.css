@@ -1893,3 +1893,26 @@ select {
     max-width: 100%;
   }
 }
+
+/* ── Skip link ────────────────────────────────────────────────────────── */
+
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -48px;
+  z-index: 50;
+  background: var(--ink);
+  color: var(--ink-inverse);
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.skip-link:focus {
+  top: 12px;
+}
+
+.main:focus {
+  outline: none;
+}

@@ -39,7 +39,7 @@ Build mode: fast. The learner delegated the build end to end ("Create the entire
   Learner check: Open a due decision, record what happened, read the result card.
   Commit: `Add outcome recording with before/after feedback`
 
-- [ ] **4. Insights shows your blind spots**
+- [x] **4. Insights shows your blind spots**
   Becomes usable: Home screen with headline, three numbers, ready-to-review strip, blind-spot cards, calibration chart, expected-vs-actual by area, mood patterns.
   Why now: The payoff view; depends on the stats engine and real outcomes from slices 2–3.
   PRD ref: `prd.md > Insights`, `prd.md > The Core Journey`
