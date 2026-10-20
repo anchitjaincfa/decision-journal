@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Decision Journal: app map</title>
+<style>
+  :root { --bg:#f4f5f7; --surface:#fff; --ink:#101217; --ink2:#4f5562; --ink3:#686e7a; --line:#e2e5ea; --over:#d13f3e; --under:#2a78d6; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0d0f13; --surface:#161920; --ink:#eceef2; --ink2:#a9afbb; --ink3:#7d8391; --line:#262b35; --over:#e66767; --under:#3987e5; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 860px; margin: 0 auto; padding: 40px 16px 64px; }
+  h1 { font-size: 28px; letter-spacing: -0.02em; margin: 0 0 6px; }
+  h2 { font-size: 18px; margin: 36px 0 12px; }
+  p { margin: 0 0 12px; color: var(--ink2); }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px; margin-bottom: 12px; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; background: var(--bg); padding: 1px 5px; border-radius: 5px; color: var(--ink); }
+  ol, ul { padding-left: 20px; color: var(--ink2); margin: 0; }
+  li { margin: 6px 0; }
+  li strong, .card strong { color: var(--ink); }
+  details { border-top: 1px solid var(--line); padding: 10px 0; }
+  details:first-of-type { border-top: 0; }
+  summary { cursor: pointer; font-weight: 600; color: var(--ink); }
+  svg text { font: 12.5px ui-sans-serif, system-ui, sans-serif; fill: var(--ink); }
+  svg .muted { fill: var(--ink3); }
+  svg .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+  svg .arrow { stroke: var(--ink3); stroke-width: 1.5; fill: none; }
+  .meta { font-size: 13px; color: var(--ink3); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Decision Journal: app map</h1>
+  <p>A compact guide to where things live. It's a snapshot of the code at the commit below and can drift as the code changes.</p>
+
+  <div class="card">
+    <strong>What the app is.</strong>
+    <p style="margin-top:6px">A browser-only React app. Decisions are saved in <code>localStorage</code>. One file of pure functions (<code>src/lib/stats.ts</code>) turns the list of decisions into every number on screen, including the live Reality check that warns you while you decide.</p>
+    <ul>
+      <li><strong>Screens:</strong> <code>src/pages/</code>: Insights, Journal, New decision, Decision detail.</li>
+      <li><strong>Data in and out:</strong> <code>src/lib/store.tsx</code> (state + actions) → <code>src/lib/storage.ts</code> (localStorage, with fallbacks).</li>
+      <li><strong>The math:</strong> <code>src/lib/stats.ts</code>, tested in <code>src/lib/stats.test.ts</code>.</li>
+    </ul>
+  </div>
+
+  <h2>One action, end to end: moving the confidence slider</h2>
+  <div class="card">
+    <svg viewBox="0 0 800 170" width="100%" role="img" aria-label="Slider change flows from NewDecisionPage state to realityCheck in stats.ts to the RealityCheck panel">
+      <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor" style="color:var(--ink3)"/></marker></defs>
+      <rect class="box" x="8" y="40" width="170" height="84" rx="12"/>
+      <text x="22" y="68">You drag the slider</text>
+      <text class="muted" x="22" y="90">ConfidenceSlider.tsx</text>
+      <text class="muted" x="22" y="108">onChange(90)</text>
+      <path class="arrow" d="M180,82 L232,82" marker-end="url(#a)"/>
+      <rect class="box" x="236" y="40" width="170" height="84" rx="12"/>
+      <text x="250" y="68">Page state updates</text>
+      <text class="muted" x="250" y="90">NewDecisionPage.tsx</text>
+      <text class="muted" x="250" y="108">useMemo(realityCheck…)</text>
+      <path class="arrow" d="M408,82 L460,82" marker-end="url(#a)"/>
+      <rect class="box" x="464" y="40" width="160" height="84" rx="12"/>
+      <text x="478" y="68">Engine compares</text>
+      <text class="muted" x="478" y="90">stats.ts</text>
+      <text class="muted" x="478" y="108">realityCheck()</text>
+      <path class="arrow" d="M626,82 L672,82" marker-end="url(#a)"/>
+      <rect class="box" x="676" y="40" width="116" height="84" rx="12"/>
+      <text x="690" y="68">Panel shows</text>
+      <text class="muted" x="690" y="90">“90% looks</text>
+      <text class="muted" x="690" y="108">high…”</text>
+      <circle cx="736" cy="150" r="6" fill="none" stroke="var(--ink)" stroke-width="2"/><text class="muted" x="748" y="154">felt</text>
+      <circle cx="690" cy="150" r="6" fill="var(--over)"/><text class="muted" x="700" y="154">real</text>
+    </svg>
+  </div>
+
+  <h2>Reference route (3 stops)</h2>
+  <p>A route to follow in your editor. Search for the anchor text in each file.</p>
+  <div class="card">
+    <details open>
+      <summary>1. Input: <code>src/pages/NewDecisionPage.tsx</code>, search <code>const rc = useMemo</code></summary>
+      <p style="margin-top:8px">The form keeps area, mood and confidence in React state. Every change recomputes the Reality check from the saved decisions. Nothing is saved until “Save prediction”.</p>
+    </details>
+    <details>
+      <summary>2. Logic: <code>src/lib/stats.ts</code>, search <code>export const realityCheck</code></summary>
+      <p style="margin-top:8px">Builds evidence rows (area, mood, confidence bucket). It needs <code>MIN_N</code> (3) resolved decisions before a row counts, and calls over/underconfidence only at a <code>GAP_THRESHOLD</code> (15 points) gap. One lead group (area + mood, then area, then mood, then confidence level) drives both the headline and the suggestion. The suggestion starts from <code>smoothedRate</code> = (hits + 1) / (n + 2) and stays within 10 points of what actually happened.</p>
+    </details>
+    <details>
+      <summary>3. Output: <code>src/components/RealityCheck.tsx</code>, search <code>function Evidence</code></summary>
+      <p style="margin-top:8px">Draws each row's meter: a hollow ring at how sure you feel now and a solid dot at how often you've been right, joined by a line colored by direction. “Use N%” calls back into the page's <code>setConfidence</code>.</p>
+    </details>
+  </div>
+
+  <h2>To change this, start here</h2>
+  <div class="card">
+    <ul>
+      <li><strong>How strict the warnings are:</strong> <code>MIN_N</code> and <code>GAP_THRESHOLD</code> at the top of <code>src/lib/stats.ts</code>. Then run <code>npm test</code>.</li>
+      <li><strong>The sample person's story:</strong> <code>ROWS</code> in <code>src/lib/sampleData.ts</code>. Tests in <code>stats.test.ts</code> check the Money/Career patterns still hold.</li>
+      <li><strong>Areas, moods, check-back intervals:</strong> <code>AREAS</code>, <code>MOODS</code>, <code>REVIEW_INTERVALS</code> in <code>src/lib/types.ts</code>.</li>
+      <li><strong>Colors and type:</strong> <code>src/styles/tokens.css</code> (light and dark).</li>
+      <li><strong>Headline copy on Insights:</strong> <code>summarize</code> in <code>stats.ts</code> and <code>InsightsPage.tsx</code>.</li>
+    </ul>
+  </div>
+
+  <h2>A practice to reuse</h2>
+  <div class="card">
+    <p><strong>Pin down the core idea's behavior as tests before trusting delegated code.</strong> Here, <code>prd.md › Reality check while deciding</code> says “Money + Excited + 90% shows an overconfidence warning that names Money.” The first version of the engine passed its general tests, but printing its real output for that exact case showed it led with the confidence bucket instead of Money. A later independent review found the headline and suggestion could disagree. The fix was locked in with an exhaustive test, <em>“taking the suggestion always lands on ‘fits your record’”</em>, that checks every area × mood × confidence combination in <code>stats.test.ts</code>. On any agent-built project: check the agent's output against the literal acceptance criterion, then turn the criterion into a test the agent has to pass before each commit.</p>
+  </div>
+
+  <h2>Run it again</h2>
+  <div class="card">
+    <p><code>npm install</code> → <code>npm run dev</code> → open the printed URL. Tests: <code>npm test</code>. Live: https://decision-journal-liard.vercel.app</p>
+    <p class="meta">Snapshot of the code at commit <code>6de82d5</code>.</p>
+  </div>
+</main>
+</body>
+</html>
