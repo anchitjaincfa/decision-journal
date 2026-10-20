@@ -14,7 +14,7 @@ export default function App() {
         {route.page === 'insights' && <InsightsPage />}
         {route.page === 'journal' && <JournalPage params={route.params} />}
         {route.page === 'new' && <NewDecisionPage />}
-        {route.page === 'decision' && <DecisionPage key={route.id} id={route.id} />}
+        {route.page === 'decision' && <DecisionPage key={route.id} id={route.id} params={route.params} />}
       </main>
     </div>
   );
