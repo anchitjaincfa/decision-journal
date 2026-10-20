@@ -33,7 +33,7 @@ Develops `scope.md > The Core Loop` and `scope.md > What "Working" Looks Like`.
 One web app, four screens, with a persistent top bar: product name at left, **Insights** and **Journal** tabs in the middle, and a primary **New decision** button at right. On phones the tabs stay in the top bar and **New decision** becomes a full-width button pinned to the bottom.
 
 - **Insights** (home): the headline sentence, then three numbers (decisions resolved, overall hit rate, average confidence gap), the "Ready to review" strip, blind-spot cards, then the three charts stacked in reading order.
-- **Journal**: every decision, newest first, with filters (All / Open / Resolved) and an area filter. Each row shows the title, area, date logged, confidence, mood, and status ("Due now", "Check back in 12 days", "Came true", "Partly", "Didn't happen").
+- **Journal**: every decision, newest first, with filters (All / Open / Resolved) and an area filter. Each row shows the title, area, date logged, confidence, mood, and status ("Ready to review", "Check back in 12 days", "Came true", "Partly", "Didn't happen").
 - **New decision**: the form on the left and the **Reality check** panel on the right, sticky while scrolling. On phones the panel sits directly under the confidence slider, so the warning is visible exactly where the number is chosen.
 - **Decision detail**: the logged prediction as a read-only card at the top. Below it is either the "What happened?" form (open decisions) or the recorded outcome (resolved ones), plus a quiet "Delete decision" link.
 
@@ -69,15 +69,15 @@ Develops `scope.md > The Core Loop` step 1.
 The kernel, `scope.md > The Unique Kernel`.
 
 - The panel updates instantly whenever the area, mood or confidence changes. It shows:
-  - **A headline**: the strongest relevant signal in one sentence, colored by direction (overconfident / underconfident / on target).
+  - **A headline**: one sentence based on the most specific group with enough history (area + mood, then area, then mood, then confidence level), with its sample size, marked by direction (overconfident / underconfident / about right). A second line adds the area or mood signal that disagrees most.
   - **Up to three evidence rows**, each with its sample size:
     - "In Money": your average confidence vs. your hit rate.
     - "When Excited": your hit rate and how often it turned out well.
-    - "At 90%+ confidence, across everything": your actual hit rate.
-  - **A suggestion**: "Your track record suggests ~50%," with a **Use 50%** button that moves the slider.
+    - "At 90–100% sure": your actual hit rate at that confidence level, across everything.
+  - **A suggestion**: "Your track record suggests ~50%," with a **Use 50%** button that moves the slider. It appears only when the number is off, and comes from the same group as the headline, so taking it always lands on "fits your record." 
 - A group needs **at least 3 resolved decisions** to count as evidence. With fewer, the row says "Not enough history yet (2 of 3)."
 - "Overconfident" or "underconfident" is called only when the gap is **15 points or more**. Otherwise the panel says the confidence looks about right.
-- The suggestion comes from the most specific group with enough history (area + mood, then area, then confidence level), rounded to the nearest 5 and kept within 50–100.
+- The suggestion uses the headline's group: the smoothed hit rate, kept within 10 points of the real one, rounded to the nearest 5 and kept within 50–100. A confidence-level group never produces a suggestion, because moving the slider changes the group. If even 50% is above the record, the panel says it's closer to a coin flip and suggests predicting a different outcome.
   - [ ] With the sample journal, choosing Money + Excited + 90% shows an overconfidence warning that names Money, gives a number below 90, and shows sample sizes.
   - [ ] Choosing Career at 60% shows an underconfidence message.
   - [ ] Pressing "Use N%" moves the slider to N and the headline updates.

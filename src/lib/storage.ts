@@ -1,7 +1,8 @@
 import { buildSampleJournal } from './sampleData';
 import { isArea, isMood, type Decision, type StoredJournal } from './types';
 
-const KEY = 'decision-journal:v1';
+export const JOURNAL_KEY = 'decision-journal:v1';
+const KEY = JOURNAL_KEY;
 
 export interface LoadResult {
   journal: StoredJournal;
@@ -10,6 +11,20 @@ export interface LoadResult {
   /** True when saved data was unreadable and the sample was restored. */
   recovered: boolean;
 }
+
+const isDate = (v: unknown) => typeof v === 'string' && !Number.isNaN(new Date(v).getTime());
+
+const isOutcome = (o: unknown) => {
+  if (o === undefined) return true;
+  if (!o || typeof o !== 'object') return false;
+  const x = o as Record<string, unknown>;
+  return (
+    typeof x.actual === 'string' &&
+    (x.verdict === 'yes' || x.verdict === 'partly' || x.verdict === 'no') &&
+    (x.result === 'good' || x.result === 'mixed' || x.result === 'bad') &&
+    isDate(x.recordedAt)
+  );
+};
 
 const isDecision = (d: unknown): d is Decision => {
   if (!d || typeof d !== 'object') return false;
@@ -21,8 +36,11 @@ const isDecision = (d: unknown): d is Decision => {
     isArea(x.area) &&
     isMood(x.mood) &&
     typeof x.confidence === 'number' &&
-    typeof x.createdAt === 'string' &&
-    typeof x.reviewAt === 'string'
+    x.confidence >= 50 &&
+    x.confidence <= 100 &&
+    isDate(x.createdAt) &&
+    isDate(x.reviewAt) &&
+    isOutcome(x.outcome)
   );
 };
 

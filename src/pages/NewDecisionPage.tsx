@@ -51,7 +51,12 @@ export function NewDecisionPage() {
     navigate(href.decision(d.id, { logged: '1' }));
   };
 
-  const panel = <RealityCheck rc={rc} confidence={confidence} onUse={setConfidence} />;
+  // After taking a suggestion the button disappears, so keep keyboard focus on the slider.
+  const useSuggestion = (v: number) => {
+    setConfidence(v);
+    setTimeout(() => document.getElementById('confidence')?.focus(), 0);
+  };
+  const panel = <RealityCheck rc={rc} confidence={confidence} onUse={useSuggestion} />;
 
   return (
     <div className="container">

@@ -50,6 +50,12 @@ describe('storage', () => {
     expect(r.journal.isSample).toBe(true);
   });
 
+  it('rejects a saved outcome with a missing verdict', () => {
+    const bad = { version: 1, isSample: false, decisions: [{ id: 'x', title: 't', expected: 'e', area: 'money', mood: 'calm', confidence: 70, createdAt: '2026-01-01T00:00:00Z', reviewAt: '2026-02-01T00:00:00Z', outcome: {} }] };
+    install(fakeStorage({ initial: { [KEY]: JSON.stringify(bad) } }));
+    expect(loadJournal().recovered).toBe(true);
+  });
+
   it('round-trips a saved journal', () => {
     const s = fakeStorage();
     install(s);

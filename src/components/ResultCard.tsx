@@ -22,7 +22,7 @@ const COPY: Record<Verdict, { title: string; lead: (c: number) => string }> = {
 export function ResultCard({ verdict, confidence, changes }: { verdict: Verdict; confidence: number; changes: Change[] }) {
   const copy = COPY[verdict];
   return (
-    <section className={`result is-${verdict}`} role="status" aria-live="polite">
+    <section id="result-card" tabIndex={-1} className={`result is-${verdict}`} role="status" aria-live="polite">
       <div className="result-kicker">
         <span className="result-icon" aria-hidden="true">
           {verdict === 'yes' ? <CheckIcon /> : verdict === 'no' ? <CrossIcon /> : <HalfIcon />}

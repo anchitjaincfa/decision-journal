@@ -100,7 +100,7 @@ export interface RealityCheck {
     value: number;
     basis: string;
     n: number;
-    /** True when the record says the expected outcome is a coin flip or worse. */
+    /** True when even 50% is above the record: the expected outcome itself may be wrong. */
     coinFlip: boolean;
   } | null;
 }
@@ -165,45 +165,69 @@ export const realityCheck = (ds: Decision[], draft: Draft): RealityCheck => {
     };
   }
 
-  // Headline: the area you're deciding in leads (that's how people think about
-  // their own judgment), then mood, then confidence level. The strongest other
-  // signal that disagrees with your number becomes a second line.
-  const lead = usable.find((x) => x.key === 'area') ?? usable.find((x) => x.key === 'mood') ?? usable[0];
-  const dir = direction(lead.gapToDraft);
-  const sentence = (row: EvidenceRow) => `${cap(where(row.key, draft, bucket.label))}, you’ve been right ${p(row.stats.hitRate)} of the time.`;
-  const headline =
-    dir === 'over'
-      ? `${conf}% looks high. ${sentence(lead)}`
+  // One group drives both the headline and the suggestion, so they can never
+  // disagree: the most specific one with enough history (area + mood, then
+  // area, then mood, then confidence level).
+  const areaMoodItems = draft.area && draft.mood ? r.filter((d) => d.area === draft.area && d.mood === draft.mood) : [];
+  const areaMood = groupStats(areaMoodItems);
+  type Lead = { key: EvidenceRow['key'] | 'areaMood'; stats: GroupStats };
+  const leads: Lead[] = [
+    { key: 'areaMood', stats: areaMood },
+    ...(['area', 'mood', 'bucket'] as const).flatMap((k) => usable.filter((x) => x.key === k).map((x) => ({ key: k, stats: x.stats }))),
+  ];
+  const lead = leads.find((x) => x.stats.n >= MIN_N)!;
+  const leadGap = conf - lead.stats.hitRate * 100;
+  const dir = direction(leadGap);
+  const place = lead.key === 'areaMood' ? `on ${areaLabel(draft.area!)} decisions made while ${moodLabel(draft.mood!).toLowerCase()}` : where(lead.key, draft, bucket.label);
+  const evidence = `${cap(place)}, you’ve been right ${p(lead.stats.hitRate)} of the time (${lead.stats.n} decisions).`;
+  // At 50% there is no lower number to suggest: the expected outcome itself is the problem.
+  const coinFlip = dir === 'over' && conf <= 50;
+  const headline = coinFlip
+    ? `Even 50% may be generous. ${evidence}`
+    : dir === 'over'
+      ? `${conf}% looks high. ${evidence}`
       : dir === 'under'
-        ? `You may be underselling this. ${sentence(lead)}`
-        : `${conf}% fits your record. ${sentence(lead)}`;
-  const kicker = dir === 'over' ? 'Careful: likely overconfident' : dir === 'under' ? 'Likely underconfident' : 'About right';
-  // The mood the person chose is a more meaningful second signal than a
-  // generic confidence bucket, so it wins whenever it disagrees.
-  const others = usable.filter((x) => x !== lead && direction(x.gapToDraft) !== 'even');
-  const other =
-    others.find((x) => x.key === 'mood') ??
-    others.sort((a, b) => Math.abs(b.gapToDraft) - Math.abs(a.gapToDraft))[0];
+        ? `You may be underselling this. ${evidence}`
+        : `${conf}% fits your record. ${evidence}`;
+  const kicker = coinFlip
+    ? 'Closer to a coin flip'
+    : dir === 'over'
+      ? 'Careful: likely overconfident'
+      : dir === 'under'
+        ? 'Likely underconfident'
+        : 'About right';
+
+  // Second line: the area or mood signal that most disagrees with the number
+  // (generic confidence buckets make confusing second lines, so they're skipped).
+  // When the headline is already about area + mood, the area on its own is
+  // the most natural follow-up ("and on Money decisions in general…").
+  const candidates2 = usable
+    .filter((x) => (x.key === 'area' || x.key === 'mood') && x.key !== lead.key && direction(x.gapToDraft) !== 'even')
+    .sort((a, b) => Math.abs(b.gapToDraft) - Math.abs(a.gapToDraft));
+  const other = (lead.key === 'areaMood' && candidates2.find((x) => x.key === 'area')) || candidates2[0];
   const secondary = other
-    ? `${direction(other.gapToDraft) === dir ? 'And' : 'But'} ${where(other.key, draft, bucket.label)}, it’s ${p(other.stats.hitRate)}.`
+    ? `${direction(other.gapToDraft) === dir ? 'And' : 'But'} ${where(other.key, draft, bucket.label)}${lead.key === 'areaMood' ? ' in general' : ''}, it’s ${p(other.stats.hitRate)}.`
     : null;
 
-  // Suggestion: the most specific group with enough history.
-  const areaMood = draft.area && draft.mood ? r.filter((d) => d.area === draft.area && d.mood === draft.mood) : [];
-  const options: { items: Decision[]; basis: (n: number) => string }[] = [
-    {
-      items: areaMood,
-      basis: (n) => `your ${n} ${areaLabel(draft.area ?? 'other')} decisions made while ${moodLabel(draft.mood ?? 'calm').toLowerCase()}`,
-    },
-    { items: draft.area ? r.filter((d) => d.area === draft.area) : [], basis: (n) => `your ${n} ${areaLabel(draft.area ?? 'other')} decisions` },
-    { items: r.filter((d) => bucketOf(d.confidence).id === bucket.id), basis: (n) => `your ${n} decisions at ${bucket.label} sure` },
-  ];
-  const pick = options.find((o) => o.items.length >= MIN_N);
+  // Suggestion: only when the number is off. Start from the smoothed rate
+  // (small samples pulled toward 50%), but stay within 10 points of what
+  // actually happened, so taking the suggestion always lands on "fits".
   let suggestion: RealityCheck['suggestion'] = null;
-  if (pick) {
-    const s = groupStats(pick.items);
-    const raw = smoothedRate(s) * 100;
-    suggestion = { value: clamp(round5(raw), 50, 100), basis: pick.basis(s.n), n: s.n, coinFlip: raw < 50 };
+  // A bucket-based number would move you into a different bucket, so only
+  // area and mood history can produce a suggestion.
+  if (dir !== 'even' && !coinFlip && lead.key !== 'bucket') {
+    const raw = lead.stats.hitRate * 100;
+    const smooth = smoothedRate(lead.stats) * 100;
+    const value = clamp(round5(raw + clamp(smooth - raw, -10, 10)), 50, 100);
+    if (value !== conf) {
+      const basis =
+        lead.key === 'areaMood'
+          ? `your ${lead.stats.n} ${areaLabel(draft.area!)} decisions made while ${moodLabel(draft.mood!).toLowerCase()}`
+          : lead.key === 'area'
+            ? `your ${lead.stats.n} ${areaLabel(draft.area!)} decisions`
+            : `your ${lead.stats.n} decisions made while ${moodLabel(draft.mood!).toLowerCase()}`;
+      suggestion = { value, basis, n: lead.stats.n, coinFlip: value === 50 && direction(50 - raw) === 'over' };
+    }
   }
 
   return { status: 'ok', direction: dir, kicker, headline, secondary, rows, suggestion };
@@ -225,7 +249,7 @@ export interface Summary {
   openCount: number;
   overall: GroupStats;
   /** The one-sentence headline: how sure you feel vs how often you're right. */
-  headline: { felt: string; real: number; n: number; direction: Direction } | null;
+  headline: { basis: 'high' | 'overall'; felt: string; real: number; n: number; direction: Direction } | null;
 }
 
 export const summarize = (ds: Decision[]): Summary => {
@@ -234,9 +258,10 @@ export const summarize = (ds: Decision[]): Summary => {
   const high = groupStats(r.filter((d) => d.confidence >= 80));
   let headline: Summary['headline'] = null;
   if (high.n >= MIN_N) {
-    headline = { felt: '80%+ sure', real: high.hitRate, n: high.n, direction: direction(high.gap) };
+    headline = { basis: 'high', felt: '80%+ sure', real: high.hitRate, n: high.n, direction: direction(high.gap) };
   } else if (overall.n >= MIN_N) {
     headline = {
+      basis: 'overall',
       felt: `${Math.round(overall.avgConfidence)}% sure`,
       real: overall.hitRate,
       n: overall.n,
@@ -258,8 +283,12 @@ export const moodPatterns = (ds: Decision[]) => {
   const ranked = rows
     .filter((x) => x.enough)
     .sort((a, b) => b.stats.goodRate - a.stats.goodRate || b.stats.hitRate - a.stats.hitRate);
-  const best = ranked.length >= 2 ? ranked[0].mood : null;
-  const worst = ranked.length >= 2 ? ranked[ranked.length - 1].mood : null;
+  // Only name a best and a riskiest mood when they genuinely differ.
+  const top = ranked[0];
+  const bottom = ranked[ranked.length - 1];
+  const distinct = ranked.length >= 2 && top.stats.goodRate - bottom.stats.goodRate >= 0.15;
+  const best = distinct && top.stats.goodRate >= 0.5 ? top.mood : null;
+  const worst = distinct && bottom.stats.goodRate < 0.5 ? bottom.mood : null;
   return { rows, best, worst };
 };
 

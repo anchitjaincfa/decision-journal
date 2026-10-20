@@ -685,6 +685,10 @@ select {
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--focus) 35%, transparent);
 }
 
+.range:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--focus) 35%, transparent);
+}
+
 .range-scale {
   display: flex;
   justify-content: space-between;
@@ -921,6 +925,10 @@ select {
 
 /* Result card after recording an outcome */
 
+.result:focus {
+  outline: none;
+}
+
 .result {
   border-radius: var(--r-lg);
   padding: var(--s5);
@@ -1050,6 +1058,9 @@ select {
 .rc-sticky {
   position: sticky;
   top: 88px;
+  max-height: calc(100vh - 104px);
+  overflow-y: auto;
+  border-radius: var(--r-lg);
 }
 
 /* Reality check panel */

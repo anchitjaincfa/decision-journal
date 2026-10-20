@@ -47,6 +47,7 @@ export function DecisionPage({ id, params }: { id: string; params: URLSearchPara
     });
     recordOutcome(decision.id, o);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => document.getElementById('result-card')?.focus({ preventScroll: true }), 0);
   };
 
   const notDueYet = !decision.outcome && new Date(decision.reviewAt) > now;
@@ -108,11 +109,13 @@ export function DecisionPage({ id, params }: { id: string; params: URLSearchPara
           <>
             <span>Delete this decision? This can’t be undone.</span>
             <button
+              id="confirm-delete"
               type="button"
               className="btn btn-danger btn-sm"
               onClick={() => {
-                deleteDecision(decision.id);
+                const id = decision.id;
                 navigate(href.journal());
+                setTimeout(() => deleteDecision(id), 0);
               }}
             >
               Delete
@@ -122,7 +125,14 @@ export function DecisionPage({ id, params }: { id: string; params: URLSearchPara
             </button>
           </>
         ) : (
-          <button type="button" className="link" onClick={() => setConfirmDelete(true)}>
+          <button
+            type="button"
+            className="link"
+            onClick={() => {
+              setConfirmDelete(true);
+              setTimeout(() => document.getElementById('confirm-delete')?.focus(), 0);
+            }}
+          >
             Delete decision
           </button>
         )}

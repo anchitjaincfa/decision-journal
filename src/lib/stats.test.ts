@@ -139,7 +139,7 @@ describe('realityCheck', () => {
 });
 
 describe('realityCheck copy', () => {
-  it('names the area first and adds the mood as a second signal', () => {
+  it('names Money in the headline and adds a second signal', () => {
     const rc = realityCheck(sample, { area: 'money', mood: 'excited', confidence: 90 });
     expect(rc.headline).toMatch(/^90% looks high\. On Money decisions/);
     expect(rc.secondary).toMatch(/^And /);
@@ -209,5 +209,62 @@ describe('insights', () => {
 
   it('has no blind spots in an empty journal', () => {
     expect(blindSpots([])).toEqual([]);
+  });
+});
+
+describe('headline and suggestion agree', () => {
+  const areas = ['money', 'career', 'health', 'relationships', 'home', 'other', null] as const;
+  const moods = ['calm', 'confident', 'excited', 'anxious', 'rushed', 'tired', null] as const;
+  const confs = [50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100];
+
+  it('never offers a suggestion when the number already fits', () => {
+    for (const area of areas) for (const mood of moods) for (const confidence of confs) {
+      const rc = realityCheck(sample, { area, mood, confidence });
+      if (rc.direction === 'even') expect(rc.suggestion).toBeNull();
+    }
+  });
+
+  it('taking the suggestion always lands on "fits your record"', () => {
+    for (const area of areas) for (const mood of moods) for (const confidence of confs) {
+      const s = realityCheck(sample, { area, mood, confidence }).suggestion;
+      if (!s) continue;
+      const after = realityCheck(sample, { area, mood, confidence: s.value });
+      // At the 50% floor a bad record can't be fixed by a lower number: it says "coin flip" instead.
+      if (s.coinFlip && s.value === 50) expect(after.kicker).toBe('Closer to a coin flip');
+      else expect(after.direction, `${area}/${mood}/${confidence} → ${s.value}`).toBe('even');
+    }
+  });
+
+  it('moves the suggestion in the direction of the warning', () => {
+    for (const area of areas) for (const mood of moods) for (const confidence of confs) {
+      const rc = realityCheck(sample, { area, mood, confidence });
+      if (!rc.suggestion) continue;
+      if (rc.direction === 'over') expect(rc.suggestion.value).toBeLessThan(confidence);
+      if (rc.direction === 'under') expect(rc.suggestion.value).toBeGreaterThan(confidence);
+    }
+  });
+
+  it('calls a 50% guess with a bad record a coin flip instead of suggesting lower', () => {
+    const rc = realityCheck(sample, { area: 'money', mood: 'excited', confidence: 50 });
+    expect(rc.kicker).toBe('Closer to a coin flip');
+    expect(rc.suggestion).toBeNull();
+  });
+});
+
+describe('review fixes', () => {
+  it('does not call a mood "riskiest" when moods perform the same', () => {
+    const ds = [
+      ...[1, 2, 3].map(() => make({ confidence: 70, mood: 'calm' }, 'yes')),
+      ...[1, 2, 3].map(() => make({ confidence: 70, mood: 'tired' }, 'yes')),
+    ];
+    const { best, worst } = moodPatterns(ds);
+    expect(worst).toBeNull();
+    expect(best).toBeNull();
+    expect(blindSpots(ds).some((s) => s.tone === 'bad')).toBe(false);
+  });
+
+  it('says "high-confidence calls" only when the headline is about them', () => {
+    const ds = [1, 2, 3, 4].map(() => make({ confidence: 70 }, 'no'));
+    expect(summarize(ds).headline!.basis).toBe('overall');
   });
 });

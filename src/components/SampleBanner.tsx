@@ -42,6 +42,7 @@ export function Banners() {
                 </p>
                 <div className="banner-actions">
                   <button
+                    id="confirm-start-fresh"
                     type="button"
                     className="btn btn-primary btn-sm"
                     onClick={() => {
@@ -63,7 +64,14 @@ export function Banners() {
                   <strong>You’re exploring a sample journal.</strong> Maya’s {decisions.length} decisions show how it works.
                 </p>
                 <div className="banner-actions">
-                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => setConfirming(true)}>
+                  <button
+                    type="button"
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => {
+                      setConfirming(true);
+                      setTimeout(() => document.getElementById('confirm-start-fresh')?.focus(), 0);
+                    }}
+                  >
                     Start my own journal
                   </button>
                 </div>

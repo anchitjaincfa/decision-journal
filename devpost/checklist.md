@@ -59,7 +59,7 @@ Build mode: fast. The learner delegated the build end to end ("Create the entire
   Learner check: Press Start my own, look at the empty app, then reload the sample.
   Commit: `Add start-fresh flow, empty states, and responsive polish`
 
-- [ ] **6. Live on the web**
+- [x] **6. Live on the web**
   Becomes usable: A public Vercel URL anyone (judges included) can open.
   Why now: Last, because it only packages finished behavior.
   PRD ref: `prd.md > What We're Building`
@@ -91,3 +91,9 @@ Reflection:
 Activity mode:
 
 ## Revisions
+
+- Reality check headline and suggestion now come from one lead group (area + mood → area → mood → bucket), and the suggestion is shown only when the number is off. The independent review found the first version could warn "70% looks high" while suggesting 70%. An exhaustive test over every area/mood/confidence combination now guards this.
+- No suggestion from a confidence-bucket lead, and an explicit "closer to a coin flip" state at 50%. The exhaustive test showed a bucket-based suggestion moves the slider into a different bucket, so the advice never settles.
+- Best/riskiest mood only named when they differ by 15+ points of "turned out well" (review: equal moods were labelled riskiest). The Insights sub-headline wording now follows its basis (high-confidence vs overall).
+- Robustness from review: a malformed `#/decision/%` hash no longer crashes the app; store writes always start from the latest journal and sync across tabs; saved outcomes are validated; due labels and check-back dates use calendar logic; delete navigates before removing, so "not found" never flashes; focus moves on page changes, inline confirms, "Use N%" and after recording an outcome; Firefox slider focus style; the sticky panel scrolls on short screens.
+

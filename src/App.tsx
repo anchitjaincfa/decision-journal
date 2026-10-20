@@ -27,7 +27,7 @@ export default function App() {
       <TopBar route={route} />
       <Banners />
       <main className="main" id="main" tabIndex={-1}>
-        <ErrorBoundary key={route.page}>
+        <ErrorBoundary key={route.page === 'decision' ? `decision-${route.id}` : route.page}>
           {route.page === 'insights' && <InsightsPage />}
           {route.page === 'journal' && <JournalPage params={route.params} />}
           {route.page === 'new' && <NewDecisionPage />}

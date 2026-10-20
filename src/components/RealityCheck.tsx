@@ -39,23 +39,24 @@ export function RealityCheck({ rc, confidence, onUse }: Props) {
               <p className="rc-suggest-text">
                 Your track record suggests <strong>~{s.value}%</strong>
               </p>
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={() => onUse(s.value)}
-                disabled={s.value === confidence}
-              >
-                {s.value === confidence ? 'Using it' : `Use ${s.value}%`}
+              <button type="button" className="btn btn-secondary btn-sm" onClick={() => onUse(s.value)}>
+                Use {s.value}%
               </button>
             </div>
             <p className="rc-note">
               Based on {s.basis}.{' '}
-              {s.coinFlip && 'Your record says this is closer to a coin flip. Is there an outcome you’re more sure of?'}
+              {s.coinFlip && 'Even 50% is above your record here. Is there an outcome you’re more sure of?'}
             </p>
           </>
         ) : (
           <p className="rc-note" style={{ marginTop: 0 }}>
-            Suggestions appear once you’ve recorded {MIN_N} outcomes for similar decisions.
+            {rc.status !== 'ok'
+              ? `Suggestions appear once you’ve recorded ${MIN_N} outcomes for similar decisions.`
+              : rc.kicker === 'Closer to a coin flip'
+                ? 'A lower number won’t fix this one. Consider predicting a different outcome, one you’re more sure of.'
+                : rc.direction === 'even'
+                  ? 'Your number matches your track record. No change suggested.'
+                  : 'Pick a life area or mood to get a suggested number.'}
           </p>
         )}
         <div className="legend" style={{ marginTop: 12 }}>

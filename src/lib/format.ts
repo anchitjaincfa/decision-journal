@@ -11,16 +11,22 @@ export const pts = (gap: number) => {
 export const shortDate = (iso: string) =>
   new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 
-export const addDays = (iso: string, days: number) => new Date(new Date(iso).getTime() + days * DAY).toISOString();
+/** Calendar days, so daylight-saving changes don't shift the date. */
+export const addDays = (iso: string, days: number) => {
+  const d = new Date(iso);
+  d.setDate(d.getDate() + days);
+  return d.toISOString();
+};
 
 export const daysBetween = (fromIso: string, toIso: string) =>
   Math.round((new Date(toIso).getTime() - new Date(fromIso).getTime()) / DAY);
 
 /** "Due now", "Due in 12 days", "Due tomorrow". */
 export const dueLabel = (reviewAt: string, now: Date) => {
-  const d = daysBetween(now.toISOString(), reviewAt);
-  if (d <= 0) return 'Ready to review';
-  if (d === 1) return 'Check back tomorrow';
+  const ms = new Date(reviewAt).getTime() - now.getTime();
+  if (ms <= 0) return 'Ready to review';
+  const d = Math.ceil(ms / DAY);
+  if (d <= 1) return 'Check back tomorrow';
   return `Check back in ${d} days`;
 };
 

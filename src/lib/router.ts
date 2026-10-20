@@ -11,9 +11,17 @@ export const parseHash = (hash: string): Route => {
   const parts = path.split('/').filter(Boolean);
   if (parts[0] === 'journal') return { page: 'journal', params: new URLSearchParams(query) };
   if (parts[0] === 'new') return { page: 'new' };
-  if (parts[0] === 'decision' && parts[1])
-    return { page: 'decision', id: decodeURIComponent(parts[1]), params: new URLSearchParams(query) };
+  if (parts[0] === 'decision' && parts[1]) return { page: 'decision', id: safeDecode(parts[1]), params: new URLSearchParams(query) };
   return { page: 'insights' };
+};
+
+/** A hand-typed bad URL like #/decision/% must not crash the app. */
+const safeDecode = (s: string) => {
+  try {
+    return decodeURIComponent(s);
+  } catch {
+    return s;
+  }
 };
 
 export const href = {
@@ -36,9 +44,17 @@ export const navigate = (to: string) => {
 export const useRoute = (): Route => {
   const [route, setRoute] = useState(() => parseHash(window.location.hash));
   useEffect(() => {
+    let path = window.location.hash.split('?')[0];
     const onChange = () => {
       setRoute(parseHash(window.location.hash));
-      window.scrollTo(0, 0);
+      const next = window.location.hash.split('?')[0];
+      // Filter changes keep your place; a new page starts at the top, and
+      // focus moves to the content so screen readers hear the new page.
+      if (next !== path) {
+        window.scrollTo(0, 0);
+        document.getElementById('main')?.focus({ preventScroll: true });
+      }
+      path = next;
     };
     window.addEventListener('hashchange', onChange);
     return () => window.removeEventListener('hashchange', onChange);

@@ -56,7 +56,7 @@ export function InsightsPage() {
         </h1>
         <p className="hero-sub">
           {h.direction === 'over'
-            ? `Across ${h.n} high-confidence calls, feeling sure hasn’t meant being right. Here’s where the gap comes from.`
+            ? `Across ${h.n} ${h.basis === 'high' ? 'high-confidence calls' : 'calls'}, feeling sure hasn’t meant being right. Here’s where the gap comes from.`
             : h.direction === 'under'
               ? `Across ${h.n} calls, your gut has been better than you give it credit for.`
               : `Across ${h.n} calls, your confidence has matched reality well.`}

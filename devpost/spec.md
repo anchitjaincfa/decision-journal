@@ -77,7 +77,7 @@ PRD ref: `prd.md > States and Boundaries`.
 - `areaGaps`, `moodPatterns`.
 - `blindSpots`: n ≥ 3 and |gap| ≥ 15, plus best/worst mood by turned-out-well rate, at most 4.
 - `dueForReview(decisions, now)`.
-- `realityCheck(decisions, draft)`: evidence rows, headline (strongest qualifying signal), and suggestion from the most specific qualifying group (area + mood → area → confidence bucket). Smoothed hit rate `(hits + 1) / (n + 2)`, rounded to 5, clamped to 50–100.
+- `realityCheck(decisions, draft)`: evidence rows (area, mood, confidence bucket). One lead group, the most specific with enough history (area + mood → area → mood → bucket), drives both the headline and the suggestion so they can't disagree. The suggestion is only offered when the number is off and the lead isn't a bucket. It's the smoothed hit rate `(hits + 1) / (n + 2)`, kept within 10 points of the raw rate, rounded to 5 and clamped to 50–100.
 - Constants `MIN_N = 3`, `GAP_THRESHOLD = 15`.
 
 Tests in `lib/stats.test.ts`.

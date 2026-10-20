@@ -22,7 +22,7 @@ export function Footer() {
           {confirming ? (
             <>
               <span>Replace your journal with the sample?</span>
-              <button type="button" className="link" onClick={reload}>
+              <button id="confirm-reload" type="button" className="link" onClick={reload}>
                 Yes, replace it
               </button>
               <button type="button" className="link" onClick={() => setConfirming(false)}>
@@ -30,7 +30,15 @@ export function Footer() {
               </button>
             </>
           ) : (
-            <button type="button" className="link" onClick={() => (isSample ? reload() : setConfirming(true))}>
+            <button
+              type="button"
+              className="link"
+              onClick={() => {
+                if (isSample) return reload();
+                setConfirming(true);
+                setTimeout(() => document.getElementById('confirm-reload')?.focus(), 0);
+              }}
+            >
               Reload sample journal
             </button>
           )}
