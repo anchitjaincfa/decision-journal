@@ -9,6 +9,9 @@ import {
   score,
   smoothedRate,
   summarize,
+  blindSpots,
+  dueForReview,
+  moodPatterns,
 } from './stats';
 import type { Decision } from './types';
 
@@ -177,5 +180,34 @@ describe('summarize', () => {
 
   it('has no headline for an empty journal', () => {
     expect(summarize([]).headline).toBeNull();
+  });
+});
+
+describe('insights', () => {
+  it('finds Money overconfidence, Career underconfidence, and a best and worst mood', () => {
+    const spots = blindSpots(sample);
+    expect(spots.length).toBeLessThanOrEqual(4);
+    expect(spots.find((s) => s.tone === 'over')?.title).toBe('Money decisions');
+    expect(spots.find((s) => s.tone === 'under')?.title).toBe('Career decisions');
+    expect(spots.some((s) => s.tone === 'good')).toBe(true);
+    expect(spots.some((s) => s.tone === 'bad')).toBe(true);
+  });
+
+  it('ignores moods without enough history when picking best and worst', () => {
+    const { best, worst, rows } = moodPatterns(sample);
+    const enough = rows.filter((r) => r.enough).map((r) => r.mood);
+    expect(enough).toContain(best);
+    expect(enough).toContain(worst);
+    expect(best).not.toBe(worst);
+  });
+
+  it('lists only open decisions past their check-back date, oldest first', () => {
+    const due = dueForReview(sample, NOW);
+    expect(due.every((d) => !d.outcome && new Date(d.reviewAt) <= NOW)).toBe(true);
+    expect(due.map((d) => d.reviewAt)).toEqual([...due.map((d) => d.reviewAt)].sort());
+  });
+
+  it('has no blind spots in an empty journal', () => {
+    expect(blindSpots([])).toEqual([]);
   });
 });

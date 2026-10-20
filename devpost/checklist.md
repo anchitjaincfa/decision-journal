@@ -29,7 +29,7 @@ Build mode: fast. The learner delegated the build end to end ("Create the entire
   Learner check: Start a Money decision while Excited at 90% and read what the app tells you; press Use N%.
   Commit: `Add new decision form with live reality check`
 
-- [ ] **3. Recording an outcome updates your numbers**
+- [x] **3. Recording an outcome updates your numbers**
   Becomes usable: Outcome form on open decisions, result card with before → after hit rates, delete with inline confirm.
   Why now: Closes the loop. Without it, predictions never feed back into the warning.
   PRD ref: `prd.md > Recording an outcome`, `prd.md > States and Boundaries`

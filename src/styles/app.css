@@ -882,7 +882,6 @@ select {
   font-weight: 600;
   letter-spacing: -0.03em;
   line-height: 1;
-  font-variant-numeric: tabular-nums;
 }
 
 .big-conf .label-sm {
@@ -1088,20 +1087,13 @@ select {
   background: var(--over-wash);
 }
 
-.rc.is-over .rc-kicker {
-  color: var(--over-ink);
-}
 
 .rc.is-under .rc-head {
   background: var(--under-wash);
 }
 
-.rc.is-under .rc-kicker {
-  color: var(--under-ink);
-}
 
-.rc.is-even .rc-kicker,
-.rc.is-none .rc-kicker {
+.rc-kicker {
   color: var(--ink-2);
 }
 
@@ -1274,15 +1266,18 @@ select {
 }
 
 .hero-line .real {
-  color: var(--over-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 0.12em;
+  text-underline-offset: 0.12em;
+  text-decoration-color: var(--over);
 }
 
 .hero-line.is-under .real {
-  color: var(--under-ink);
+  text-decoration-color: var(--under);
 }
 
 .hero-line.is-even .real {
-  color: var(--ink);
+  text-decoration-color: var(--even);
 }
 
 .hero-sub {
@@ -1320,12 +1315,30 @@ select {
   font-variant-numeric: tabular-nums;
 }
 
-.tile-value.is-over {
-  color: var(--over-ink);
+.tile-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-2);
+  margin-top: 4px;
 }
 
-.tile-value.is-under {
-  color: var(--under-ink);
+.tile-tag::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--even);
+}
+
+.tile-tag.is-over::before {
+  background: var(--over);
+}
+
+.tile-tag.is-under::before {
+  background: var(--under);
 }
 
 .tile-note {
@@ -1444,23 +1457,16 @@ select {
   background: var(--good);
 }
 
+.spot.is-bad::before {
+  background: var(--over);
+}
+
 .spot-kicker {
   font-size: 13px;
   font-weight: 600;
   color: var(--ink-2);
 }
 
-.spot.is-over .spot-kicker {
-  color: var(--over-ink);
-}
-
-.spot.is-under .spot-kicker {
-  color: var(--under-ink);
-}
-
-.spot.is-good .spot-kicker {
-  color: var(--good);
-}
 
 .spot-title {
   font-size: 19px;
@@ -1534,15 +1540,6 @@ select {
   font-size: 13px;
 }
 
-.chart .t-over {
-  fill: var(--over-ink);
-  font-weight: 500;
-}
-
-.chart .t-under {
-  fill: var(--under-ink);
-  font-weight: 500;
-}
 
 .chart .grid {
   stroke: var(--hairline);
@@ -1603,6 +1600,10 @@ select {
   stroke: var(--even);
 }
 
+.chart .st-good {
+  fill: var(--good);
+}
+
 .chart .bar-hit {
   fill: var(--ink);
 }
@@ -1630,6 +1631,11 @@ select {
   outline: none;
 }
 
+.chart .focus-ring {
+  fill: none;
+  stroke: none;
+}
+
 .chart .mark-group:focus-visible .focus-ring {
   stroke: var(--focus);
   stroke-width: 2;
@@ -1646,13 +1652,14 @@ select {
   border-radius: 10px;
   padding: 10px 12px;
   font-size: 13px;
-  min-width: 170px;
+  min-width: 200px;
   transform: translate(-50%, calc(-100% - 12px));
 }
 
 .tooltip-title {
   font-weight: 600;
   margin-bottom: 4px;
+  white-space: nowrap;
 }
 
 .tooltip-row {
@@ -1817,10 +1824,19 @@ select {
 
   .tile {
     display: flex;
+    flex-wrap: wrap;
     align-items: baseline;
     justify-content: space-between;
-    gap: var(--s3);
+    gap: 0 var(--s3);
     padding: var(--s4);
+  }
+
+  .tile-tag {
+    flex-basis: 100%;
+  }
+
+  .hero {
+    padding-top: var(--s3);
   }
 
   .tile-value {

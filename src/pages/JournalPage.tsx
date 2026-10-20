@@ -2,7 +2,7 @@ import { DecisionRow } from '../components/DecisionRow';
 import { plural } from '../lib/format';
 import { href, navigate } from '../lib/router';
 import { useJournal } from '../lib/store';
-import { AREAS, isArea, type Area, type Decision } from '../lib/types';
+import { AREAS, isArea, isMood, moodLabel, type Area, type Decision, type Mood } from '../lib/types';
 
 type Status = 'all' | 'open' | 'resolved';
 const STATUSES: { id: Status; label: string }[] = [
@@ -11,8 +11,10 @@ const STATUSES: { id: Status; label: string }[] = [
   { id: 'resolved', label: 'Resolved' },
 ];
 
-const matches = (d: Decision, status: Status, area: Area | null) =>
-  (status === 'all' || (status === 'open' ? !d.outcome : Boolean(d.outcome))) && (!area || d.area === area);
+const matches = (d: Decision, status: Status, area: Area | null, mood: Mood | null) =>
+  (status === 'all' || (status === 'open' ? !d.outcome : Boolean(d.outcome))) &&
+  (!area || d.area === area) &&
+  (!mood || d.mood === mood);
 
 export function JournalPage({ params }: { params: URLSearchParams }) {
   const { decisions } = useJournal();
@@ -21,18 +23,22 @@ export function JournalPage({ params }: { params: URLSearchParams }) {
   const status: Status = statusParam === 'open' || statusParam === 'resolved' ? statusParam : 'all';
   const areaParam = params.get('area');
   const area = isArea(areaParam) ? areaParam : null;
+  const moodParam = params.get('mood');
+  const mood = isMood(moodParam) ? moodParam : null;
 
-  const setFilter = (next: { status?: Status; area?: Area | null }) => {
+  const setFilter = (next: { status?: Status; area?: Area | null; mood?: Mood | null }) => {
     const s = next.status ?? status;
     const a = next.area === undefined ? area : next.area;
+    const m = next.mood === undefined ? mood : next.mood;
     const q: Record<string, string> = {};
     if (s !== 'all') q.status = s;
     if (a) q.area = a;
+    if (m) q.mood = m;
     navigate(href.journal(q));
   };
 
   const sorted = [...decisions].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  const shown = sorted.filter((d) => matches(d, status, area));
+  const shown = sorted.filter((d) => matches(d, status, area, mood));
 
   return (
     <div className="container">
@@ -77,6 +83,12 @@ export function JournalPage({ params }: { params: URLSearchParams }) {
                 </option>
               ))}
             </select>
+            {mood && (
+              <button type="button" className="chip" style={{ border: 0, cursor: 'pointer', height: 32 }} onClick={() => setFilter({ mood: null })}>
+                Felt {moodLabel(mood).toLowerCase()} <span aria-hidden="true">×</span>
+                <span className="visually-hidden">Remove mood filter</span>
+              </button>
+            )}
             <span className="count-note num">{plural(shown.length, 'decision')}</span>
           </div>
 
